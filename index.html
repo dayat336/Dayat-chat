@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dayat Friends — Galeri Kenangan</title>
+
+<style>
+:root {
+  --dark: #171329;
+  --panel: #211b3b;
+  --pink: #ff5ca8;
+  --purple: #9b72ff;
+  --gold: #ffd66b;
+  --white: #fff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--white);
+  background: linear-gradient(135deg,#ff4e9b,#755bff,#00c9a7,#ffbd59);
+  background-size: 300% 300%;
+  animation: rainbow 16s ease infinite;
+  min-height: 100vh;
+}
+@keyframes rainbow {
+  0%,100% { background-position: 0 50%; }
+  50% { background-position: 100% 50%; }
+}
+button, input, select { font: inherit; }
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-weight: bold;
+}
+button:disabled { opacity: .5; cursor: not-allowed; }
+input, select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ffffff35;
+  border-radius: 10px;
+  background: #171329;
+  color: white;
+  margin-top: 6px;
+}
+input[type=file] { padding: 9px; }
+label { display: block; margin-top: 13px; font-size: 13px; }
+.top {
+  padding: 22px 14px;
+  text-align: center;
+}
+.logo { font-size: 34px; }
+.top h1 { margin: 8px 0; font-size: clamp(26px,6vw,40px); }
+.top p { margin: 5px 0; }
+.small { color: #e7dfff; font-size: 12px; line-height: 1.6; }
+.wrap { width: min(1100px, calc(100% - 22px)); margin: auto; padding-bottom: 35px; }
+.panel {
+  background: #171329ee;
+  border: 1px solid #ffffff35;
+  border-radius: 18px;
+  padding: 17px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 25px #160a3740;
+}
+.panel h2 { font-size: 19px; margin: 0 0 12px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.row > * { min-width: 0; }
+.grow { flex: 1; }
+.btn-pink { background: linear-gradient(90deg,#ff4e9b,#a36bff); color: white; }
+.btn-gold { background: var(--gold); color: #302342; }
+.btn-muted { background: #ffffff18; color: white; border: 1px solid #ffffff35; }
+.btn-red { background: #ff5364; color: white; }
+.btn-green { background: #40d9ac; color: #152b2a; }
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 20px;
+  background: #ffffff18;
+  border: 1px solid #ffffff30;
+}
+.owner-badge { color: #302342; background: var(--gold); }
+.admin-badge { color: white; background: #825cff; }
+.member-badge { color: white; background: #168c7a; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.tabs button { flex: 1; min-width: 90px; }
+.section-title { text-align: center; margin: 24px 0 15px; }
+.members {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 12px;
+}
+.member-card {
+  height: 190px;
+  border: 2px solid #ffffff80;
+  border-radius: 16px;
+  overflow: hidden;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  display: flex;
+  align-items: end;
+  cursor: pointer;
+  box-shadow: 0 6px 17px #20103950;
+}
+.member-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 20%,#090616e8);
+}
+.member-card.active { outline: 4px solid var(--gold); outline-offset: -4px; }
+.member-info { position: relative; padding: 10px 5px; width: 100%; text-align: center; overflow-wrap: anywhere; }
+.member-info strong { display: block; font-size: 14px; }
+.member-info small { display: block; font-size: 10px; margin-top: 5px; }
+.member-info .badge { margin-top: 5px; }
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 11px;
+}
+.photo-card {
+  background: #ffffff12;
+  border: 1px solid #ffffff25;
+  border-radius: 13px;
+  overflow: hidden;
+}
+.photo-card img { width: 100%; display: block; aspect-ratio: 1/1; object-fit: cover; }
+.photo-details { padding: 10px; }
+.photo-details p { font-size: 12px; overflow-wrap: anywhere; }
+.photo-details button { width: 100%; margin-top: 5px; }
+.empty { padding: 22px 8px; text-align: center; color: #e1d9ff; font-size: 13px; }
+.notice {
+  padding: 11px;
+  border-radius: 11px;
+  margin-bottom: 9px;
+  background: #ffffff12;
+  border: 1px solid #ffffff20;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.notice.unread { border-left: 4px solid var(--gold); }
+.notice time { display: block; font-size: 11px; color: #d2c8ed; margin-top: 5px; }
+.notice button { margin-top: 7px; }
+hr { border: 0; border-top: 1px solid #ffffff25; margin: 16px 0; }
+footer { text-align: center; padding: 25px 10px; font-size: 12px; }
+.hidden { display: none !important; }
+#toast {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #171329;
+  border: 1px solid #ffffff55;
+  border-radius: 12px;
+  padding: 13px 18px;
+  z-index: 10;
+  width: max-content;
+  max-width: 90%;
+  box-shadow: 0 6px 25px #0005;
+  font-size: 13px;
+}
+@media(max-width:480px) {
+  .members { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .member-card { height: 175px; }
+  .panel { padding: 13px; }
+}
+</style>
+</head>
+
+<body>
+<header class="top">
+  <div class="logo">🌈📸💖</div>
+  <h1>Dayat Friends</h1>
+  <p>Tempat cerita, foto, dan kenangan kita.</p>
+  <p><span class="badge owner-badge">👑 OWNER: DAYAT</span></p>
+</header>
+
+<main class="wrap">
+
+  <section class="panel">
+    <h2>👤 Pengguna aktif</h2>
+    <div class="row">
+      <div class="grow">
+        <label for="activeUser">Masuk sebagai anggota</label>
+        <select id="activeUser"></select>
+      </div>
+      <div>
+        <label>Role</label>
+        <div id="currentRole" class="badge owner-badge">OWNER</div>
+      </div>
+    </div>
+    <p class="small">
+      Mode demo lokal: pemilihan pengguna di sini hanya simulasi identitas.
+      Jangan gunakan sebagai sistem keamanan untuk website publik.
+    </p>
+  </section>
+
+  <section class="panel">
+    <div class="row">
+      <h2 class="grow">🔔 Notifikasi</h2>
+      <span id="unreadCount" class="badge">0 belum dibaca</span>
+    </div>
+    <div class="row">
+      <button class="btn-muted" id="readAll">Tandai dibaca</button>
+      <button class="btn-muted" id="toggleNotices">Tampilkan / Sembunyikan</button>
+    </div>
+    <div id="notifications" style="margin-top:12px"></div>
+  </section>
+
+  <section class="panel">
+    <h2>👑 Panel Owner</h2>
+    <p class="small">Owner adalah Dayat. Owner dapat memilih Admin, mengelola nama anggota, dan menghapus foto di galeri.</p>
+    <div id="ownerPanel">
+      <label for="adminSelect">Pilih anggota yang ingin dijadikan Admin</label>
+      <select id="adminSelect"></select>
+      <button class="btn-gold" id="appointAdmin" style="margin-top:10px;width:100%">
+        🛡️ Jadikan Admin
+      </button>
+      <button class="btn-muted" id="removeAdmin" style="margin-top:8px;width:100%">
+        Hapus Role Admin
+      </button>
+    </div>
+    <p id="noOwner" class="small hidden">Hanya Owner yang dapat mengatur role Admin.</p>
+  </section>
+
+  <section class="panel">
+    <h2>🎨 Atur anggota</h2>
+    <label for="memberSelect">Pilih anggota yang ingin diatur</label>
+    <select id="memberSelect"></select>
+    <label for="nameInput">Nama anggota</label>
+    <input id="nameInput" maxlength="40" placeholder="Masukkan nama anggota">
+
+    <label for="wallpaperInput">Pilih wallpaper dari HP</label>
+    <input id="wallpaperInput" type="file" accept="image/*">
+
+    <button id="saveMember" class="btn-pink" style="width:100%;margin-top:12px">
+      💾 Simpan Nama dan Wallpaper
+    </button>
+    <p class="small">
+      Member hanya dapat mengatur profilnya sendiri. Admin dapat mengatur profil anggota lain.
+      Owner memiliki akses penuh.
+    </p>
+  </section>
+
+  <h2 class="section-title">👥 Sembilan Anggota Kita</h2>
+  <section id="members" class="members"></section>
+
+  <section class="panel" style="margin-top:24px">
+    <h2>📷 Galeri Foto Kenangan</h2>
+    <p class="small">Pilih anggota sebagai pemilik foto, lalu tambahkan foto dari HP.</p>
+
+    <label for="photoOwner">Foto ini milik anggota</label>
+    <select id="photoOwner"></select>
+
+    <label for="photoTitle">Judul atau keterangan foto</label>
+    <input id="photoTitle" maxlength="70" placeholder="Contoh: Kenangan hari Minggu">
+
+    <label for="photoInput">Pilih foto</label>
+    <input id="photoInput" type="file" accept="image/*">
+
+    <button class="btn-pink" id="addPhoto" style="width:100%;margin-top:12px">
+      ➕ Tambahkan Foto
+    </button>
+    <hr>
+    <div class="row">
+      <h2 class="grow">🖼️ Semua foto</h2>
+      <span id="photoCount" class="badge">0 foto</span>
+    </div>
+    <div id="photos" class="photo-grid"></div>
+  </section>
+
+  <section class="panel">
+    <h2>ℹ️ Panduan Role</h2>
+    <p>👑 <b>Owner — Dayat:</b> mengatur Admin, mengganti semua profil, dan menghapus foto siapa pun.</p>
+    <p>🛡️ <b>Admin:</b> mengatur profil anggota dan menghapus foto di galeri.</p>
+    <p>👥 <b>Member:</b> mengatur profil sendiri, menambahkan foto, dan menghapus foto miliknya sendiri.</p>
+    <p class="small">
+      Role dan aktivitas disimpan lokal. Siapa pun yang memiliki akses ke browser dan kode dapat
+      mengubah data lokal; ini bukan autentikasi yang aman untuk penggunaan publik.
+    </p>
+  </section>
+</main>
+
+<footer>💖 Dayat Friends — Kenangan yang tidak terlupakan 💖</footer>
+<div id="toast" class="hidden" role="status"></div>
+
+<script>
+"use strict";
+
+const TOTAL = 9;
+const KEY = "dayatFriendsCompleteV1";
+const COLORS = [
+  "linear-gradient(135deg,#ff579a,#ffc371)",
+  "linear-gradient(135deg,#695cff,#c875ff)",
+  "linear-gradient(135deg,#00bfa6,#70e1f5)",
+  "linear-gradient(135deg,#ff8c42,#ffcf56)",
+  "linear-gradient(135deg,#ff5f6d,#ffc371)",
+  "linear-gradient(135deg,#4776e6,#a854e9)",
+  "linear-gradient(135deg,#11998e,#38ef7d)",
+  "linear-gradient(135deg,#ee0979,#ff6a00)",
+  "linear-gradient(135deg,#396afc,#a770ef)"
+];
+
+const $ = id => document.getElementById(id);
+
+function freshState() {
+  return {
+    members: Array.from({length: TOTAL}, (_, i) => ({
+      name: i === 0 ? "Dayat" : "Anggota " + (i + 1),
+      wallpaper: null,
+      role: i === 0 ? "owner" : "member"
+    })),
+    photos: [],
+    notifications: [],
+    nextId: 1
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return freshState();
+    const s = JSON.parse(raw);
+    if (!s || !Array.isArray(s.members) ||
+        s.members.length !== TOTAL ||
+        !Array.isArray(s.photos) ||
+        !Array.isArray(s.notifications)) return freshState();
+
+    const base = freshState();
+    base.members = s.members.map((m, i) => ({
+      name: typeof m.name === "string" ? m.name : base.members[i].name,
+      wallpaper: typeof m.wallpaper === "string" ? m.wallpaper : null,
+      role: i === 0 ? "owner" : (m.role === "admin" ? "admin" : "member")
+    }));
+    base.members[0].name = s.members[0].name || "Dayat";
+    base.photos = s.photos.filter(p =>
+      p && typeof p.id === "number" &&
+      typeof p.image === "string" &&
+      Number.isInteger(p.owner) && p.owner >= 0 && p.owner < TOTAL
+    );
+    base.notifications = s.notifications.slice(0, 100).filter(n =>
+      n && typeof n.message === "string"
+    );
+    base.nextId = Number.isInteger(s.nextId) ? s.nextId : 1;
+    return base;
+  } catch (e) {
+    return freshState();
+  }
+}
+
+let state = loadState();
+let pendingWallpaper = null;
+let pendingPhoto = null;
+let noticesVisible = true;
+let toastTimer;
+
+function persist() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+    return true;
+  } catch (e) {
+    alert("Penyimpanan browser penuh. Hapus beberapa foto atau gunakan gambar yang lebih kecil.");
+    return false;
+  }
+}
+
+function roleOf(index) {
+  return state.members[index]?.role || "member";
+}
+
+function activeIndex() {
+  return Number($("activeUser").value || 0);
+}
+
+function selectedMember() {
+  return Number($("memberSelect").value || 0);
+}
+
+function isOwner() { return activeIndex() === 0; }
+function isAdmin() { return roleOf(activeIndex()) === "admin"; }
+function canManageAll() { return isOwner() || isAdmin(); }
+
+function roleLabel(role) {
+  if (role === "owner") return "👑 OWNER";
+  if (role === "admin") return "🛡️ ADMIN";
+  return "👥 MEMBER";
+}
+
+function notify(message) {
+  state.notifications.unshift({
+    id: state.nextId++,
+    message,
+    time: new Date().toLocaleString("id-ID"),
+    read: false
+  });
+  state.notifications = state.notifications.slice(0, 100);
+}
+
+function showToast(message) {
+  $("toast").textContent = message;
+  $("toast").classList.remove("hidden");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("toast").classList.add("hidden"), 2800);
+}
+
+function personName(i) {
+  return state.members[i]?.name || "Anggota " + (i + 1);
+}
+
+function imageCss(image) {
+  return "url('" + image + "')";
+}
+
+function addOption(select, value, text) {
+  const opt = document.createElement("option");
+  opt.value = value;
+  opt.textContent = text;
+  select.appendChild(opt);
+}
+
+function setupSelectors() {
+  $("activeUser").innerHTML = "";
+  $("memberSelect").innerHTML = "";
+  $("photoOwner").innerHTML = "";
+  $("adminSelect").innerHTML = "";
+
+  state.members.forEach((m, i) => {
+    addOption($("activeUser"), i, personName(i) + " — " + roleLabel(roleOf(i)));
+    addOption($("memberSelect"), i, "Anggota " + (i + 1) + " — " + personName(i));
+    addOption($("photoOwner"), i, personName(i));
+    if (i !== 0) addOption($("adminSelect"), i, personName(i));
+  });
+}
+
+function renderRole() {
+  const role = roleOf(activeIndex());
+  $("currentRole").textContent = roleLabel(role);
+  $("currentRole").className = "badge " +
+    (role === "owner" ? "owner-badge" :
+     role === "admin" ? "admin-badge" : "member-badge");
+
+  $("ownerPanel").classList.toggle("hidden", !isOwner());
+  $("noOwner").classList.toggle("hidden", isOwner());
+
+  const i = selectedMember();
+  const canEdit = isOwner() || isAdmin() || i === activeIndex();
+  $("nameInput").disabled = !canEdit;
+  $("wallpaperInput").disabled = !canEdit;
+  $("saveMember").disabled = !canEdit;
+}
+
+function renderMembers() {
+  const box = $("members");
+  box.innerHTML = "";
+
+  state.members.forEach((m, i) => {
+    const card = document.createElement("div");
+    card.className = "member-card" + (i === selectedMember() ? " active" : "");
+    card.style.backgroundImage = m.wallpaper ? imageCss(m.wallpaper) : COLORS[i];
+
+    const info = document.createElement("div");
+    info.className = "member-info";
+
+    const number = document.createElement("small");
+    number.textContent = "ANGGOTA " + (i + 1);
+
+    const name = document.createElement("strong");
+    name.textContent = personName(i);
+
+    const role = document.createElement("span");
+    role.className = "badge " +
+      (roleOf(i) === "owner" ? "owner-badge" :
+       roleOf(i) === "admin" ? "admin-badge" : "member-badge");
+    role.textContent = roleLabel(roleOf(i));
+
+    const hint = document.createElement("small");
+    hint.textContent = "Tekan untuk memilih";
+
+    info.append(number, name, role, hint);
+    card.appendChild(info);
+    card.addEventListener("click", () => {
+      $("memberSelect").value = String(i);
+      $("photoOwner").value = String(i);
+      loadSelectedMember();
+      renderAll();
+    });
+    box.appendChild(card);
+  });
+}
+
+function renderNotifications() {
+  const box = $("notifications");
+  box.innerHTML = "";
+  const unread = state.notifications.filter(n => !n.read).length;
+  $("unreadCount").textContent = unread + " belum dibaca";
+  box.classList.toggle("hidden", !noticesVisible);
+
+  if (!state.notifications.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "🔔 Belum ada aktivitas. Aktivitas galeri akan muncul di sini.";
+    box.appendChild(empty);
+    return;
+  }
+
+  state.notifications.forEach(n => {
+    const item = document.createElement("div");
+    item.className = "notice" + (!n.read ? " unread" : "");
+    const message = document.createElement("div");
+    message.textContent = n.message;
+    const time = document.createElement("time");
+    time.textContent = n.time + (n.read ? " · Dibaca" : " · Belum dibaca");
+    item.append(message, time);
+    if (!n.read) {
+      const btn = document.createElement("button");
+      btn.className = "btn-muted";
+      btn.textContent = "Tandai dibaca";
+      btn.addEventListener("click", () => {
+        n.read = true;
+        if (persist()) renderNotifications();
+      });
+      item.appendChild(btn);
+    }
+    box.appendChild(item);
+  });
+}
+
+function renderPhotos() {
+  const box = $("photos");
+  box.innerHTML = "";
+  $("photoCount").textContent = state.photos.length + " foto";
+
+  if (!state.photos.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.style.gridColumn = "1/-1";
+    empty.textContent = "📷 Belum ada foto. Tambahkan foto kenangan pertama kalian!";
+    box.appendChild(empty);
+    return;
+  }
+
+  state.photos.forEach(p => {
+    const card = document.createElement("article");
+    card.className = "photo-card";
+    const img = document.createElement("img");
+    img.src = p.image;
+    img.alt = p.title || "Foto kenangan";
+    const details = document.createElement("div");
+    details.className = "photo-details";
+
+    const title = document.createElement("strong");
+    title.textContent = p.title || "Foto kenangan";
+    const owner = document.createElement("p");
+    owner.textContent = "📸 Oleh: " + personName(p.owner);
+
+    details.append(title, owner);
+
+    const canDelete = isOwner() || isAdmin() || p.owner === activeIndex();
+    if (canDelete) {
+      const del = document.createElement("button");
+      del.className = "btn-red";
+      del.textContent = "🗑️ Hapus foto";
+      del.addEventListener("click", () => deletePhoto(p.id));
+      details.appendChild(del);
+    }
+
+    card.append(img, details);
+    box.appendChild(card);
+  });
+}
+
+function renderAll() {
+  setupSelectors();
+  $("activeUser").value = String(activeIndex());
+  $("memberSelect").value = String(selectedMember());
+  $("photoOwner").value = String(selectedMember());
+  $("adminSelect").value = "1";
+  renderRole();
+  renderMembers();
+  renderNotifications();
+  renderPhotos();
+}
+
+function loadSelectedMember() {
+  const i = selectedMember();
+  $("nameInput").value = personName(i);
+  pendingWallpaper = null;
+  $("wallpaperInput").value = "";
+}
+
+function loadImage(file, maxDimension = 1000) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith("image/")) {
+      reject(new Error("Pilih file gambar yang benar."));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Gagal membaca gambar."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Gambar tidak valid."));
+      img.onload = () => {
+        const scale = Math.min(1, maxDimension / img.width, maxDimension / img.height);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.78));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+$("activeUser").addEventListener("change", () => {
+  $("memberSelect").value = $("activeUser").value;
+  loadSelectedMember();
+  renderAll();
+});
+
+$("memberSelect").addEventListener("change", () => {
+  loadSelectedMember();
+  renderAll();
+});
+
+$("wallpaperInput").addEventListener("change", async () => {
+  try {
+    pendingWallpaper = await loadImage($("wallpaperInput").files[0]);
+    showToast("Wallpaper siap. Tekan Simpan Nama dan Wallpaper.");
+  } catch (e) {
+    alert(e.message);
+    $("wallpaperInput").value = "";
+  }
+});
+
+$("saveMember").addEventListener("click", () => {
+  const target = selectedMember();
+  const actor = activeIndex();
+  if (!(isOwner() || isAdmin() || target === actor)) {
+    alert("Kamu hanya dapat mengatur profil
